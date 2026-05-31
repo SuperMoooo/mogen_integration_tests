@@ -139,20 +139,25 @@ class _DataSourceVisitor extends RecursiveAstVisitor<void> {
   }
 
   String? _namedParameter(FormalParameter parameter) {
-    final child =
-        parameter is DefaultFormalParameter ? parameter.parameter : parameter;
-    if (!child.isNamed) return null;
+    dynamic child = parameter;
+    try {
+      if (child.parameter != null) {
+        child = child.parameter;
+      }
+    } catch (_) {
+      // ignore - parameter property may not exist on this node
+    }
 
-    if (child is SimpleFormalParameter) {
-      return child.name?.lexeme;
+    if (child.isNamed != true) return null;
+
+    try {
+      final nameToken = child.name;
+      if (nameToken == null) return null;
+      if (nameToken is String) return nameToken;
+      return nameToken.lexeme ?? nameToken.toString();
+    } catch (_) {
+      return null;
     }
-    if (child is FieldFormalParameter) {
-      return child.name.lexeme;
-    }
-    if (child is FunctionTypedFormalParameter) {
-      return child.name.lexeme;
-    }
-    return null;
   }
 
   String? _defaultArgumentValue(FormalParameter parameter) {
@@ -170,19 +175,30 @@ class _DataSourceVisitor extends RecursiveAstVisitor<void> {
   }
 
   String? _extractTypeName(FormalParameter parameter) {
-    final param =
-        parameter is DefaultFormalParameter ? parameter.parameter : parameter;
-
-    final type = param is SimpleFormalParameter
-        ? param.type
-        : param is FieldFormalParameter
-            ? param.type
-            : null;
-
-    if (type is NamedType) {
-      return type.name.lexeme;
+    dynamic node = parameter;
+    try {
+      if (node.parameter != null) {
+        node = node.parameter;
+      }
+    } catch (_) {
+      // ignore - node may not expose parameter
     }
-    return null;
+
+    try {
+      final typeNode = node.type;
+      if (typeNode == null) return null;
+
+      final name = typeNode.name;
+      if (name == null) return typeNode.toSource();
+      if (name is String) return name;
+      return name.lexeme ?? name.toString();
+    } catch (_) {
+      try {
+        return node.returnType?.toSource();
+      } catch (_) {
+        return null;
+      }
+    }
   }
 }
 
