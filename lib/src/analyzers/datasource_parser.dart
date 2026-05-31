@@ -129,14 +129,13 @@ class _DioGetVisitor extends RecursiveAstVisitor<void> {
 
     if (node.argumentList.arguments.isEmpty) return;
 
-    final Expression? firstArgNode = node.argumentList.arguments.first;
+    final dynamic firstArgNode = node.argumentList.arguments.first;
     final Expression expr;
-    if (firstArgNode is NamedExpression) {
-      expr = firstArgNode.expression;
-    } else if (firstArgNode is Expression) {
+
+    if (firstArgNode is Expression) {
       expr = firstArgNode;
     } else {
-      return;
+      expr = firstArgNode.expression;
     }
 
     final endpoint = _extractEndpoint(expr);
