@@ -138,9 +138,7 @@ class _DioGetVisitor extends RecursiveAstVisitor<void> {
     } catch (_) {
       // ignore - no `.expression` property
     }
-    if (expr == null) {
-      expr = firstArgNode;
-    }
+    expr ??= firstArgNode;
 
     final endpoint = _extractEndpoint(expr);
     if (endpoint != null) {
