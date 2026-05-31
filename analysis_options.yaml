@@ -1,0 +1,9 @@
+linter:
+    rules:
+        # Enforce public API documentation.
+        public_member_api_docs: true
+        # Prefer const constructors where possible.
+        prefer_const_constructors: true
+        prefer_const_declarations: true
+        # Avoid print statements in production code.
+        avoid_print: true
