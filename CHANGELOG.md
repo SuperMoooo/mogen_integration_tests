@@ -1,5 +1,5 @@
-## [1.0.0]
+## [1.0.1]
 
-### Added
+### fix
 
-- Initial commit, datasource check to generate integration tests
+- STATIC ANALYSIS
