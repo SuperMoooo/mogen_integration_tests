@@ -1,6 +1,6 @@
 name: mogen_integration_tests
 description: Scans datasource GET endpoints and auto-generates integration test scaffolding.
-version: 1.0.3
+version: 1.0.4
 homepage: https://supermoooo.github.io/Portfolio/
 repository: https://github.com/SuperMoooo/mogen_integration_tests
 environment:
