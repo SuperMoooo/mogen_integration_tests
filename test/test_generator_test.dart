@@ -39,8 +39,11 @@ void main() {
     test('parses GET endpoints from datasource files', () {
       final tmpDir = Directory.systemTemp.createTempSync('mogen_ds_parse_');
       try {
+        final featureDir = Directory(
+            '${tmpDir.path}${Platform.pathSeparator}features${Platform.pathSeparator}auth${Platform.pathSeparator}data${Platform.pathSeparator}datasources');
+        featureDir.createSync(recursive: true);
         final file = File(
-            '${tmpDir.path}${Platform.pathSeparator}auth_remote_datasource.dart');
+            '${featureDir.path}${Platform.pathSeparator}auth_remote_datasource.dart');
         file.writeAsStringSync('''
 import 'package:dio/dio.dart';
 
@@ -63,6 +66,7 @@ class AuthRemoteDataSource {
         expect(sources.first.endpoints.first.endpoint, '/Authenticate/Auth');
         expect(sources.first.endpoints.first.group, 'Authenticate');
         expect(sources.first.endpoints.first.name, 'Auth');
+        expect(sources.first.endpoints.first.featureName, 'auth');
       } finally {
         tmpDir.deleteSync(recursive: true);
       }
@@ -71,8 +75,11 @@ class AuthRemoteDataSource {
     test('skips invalid GET endpoint arguments', () {
       final tmpDir = Directory.systemTemp.createTempSync('mogen_ds_parse_');
       try {
+        final featureDir = Directory(
+            '${tmpDir.path}${Platform.pathSeparator}features${Platform.pathSeparator}auth${Platform.pathSeparator}data${Platform.pathSeparator}datasources');
+        featureDir.createSync(recursive: true);
         final file = File(
-            '${tmpDir.path}${Platform.pathSeparator}auth_remote_datasource.dart');
+            '${featureDir.path}${Platform.pathSeparator}auth_remote_datasource.dart');
         file.writeAsStringSync('''
 import 'package:dio/dio.dart';
 
@@ -106,6 +113,7 @@ class AuthRemoteDataSource {
         endpoint: '/Authenticate/Auth',
         group: 'Authenticate',
         name: 'Auth',
+        featureName: 'auth',
         sourceFilePath:
             '/project/lib/features/auth/data/datasources/auth_remote_datasource.dart',
       );

@@ -43,11 +43,12 @@ class DataSourceParser {
 
   DataSourceInfo _parse(String filePath) {
     final content = File(filePath).readAsStringSync();
+    final featureName = _extractFeatureName(filePath);
+    final visitor =
+        _DataSourceVisitor(filePath: filePath, featureName: featureName);
     final parsed = parseString(content: content, path: filePath);
-    final visitor = _DataSourceVisitor(filePath: filePath);
     parsed.unit.visitChildren(visitor);
 
-    final featureName = _extractFeatureName(filePath);
     return DataSourceInfo(
       featureName: featureName,
       sourceFilePath: filePath,
@@ -67,9 +68,10 @@ class DataSourceParser {
 }
 
 class _DataSourceVisitor extends RecursiveAstVisitor<void> {
-  _DataSourceVisitor({required this.filePath});
+  _DataSourceVisitor({required this.filePath, required this.featureName});
 
   final String filePath;
+  final String featureName;
   final endpoints = <EndpointInfo>[];
 
   @override
@@ -83,6 +85,7 @@ class _DataSourceVisitor extends RecursiveAstVisitor<void> {
       final methodName = member.name.lexeme;
       final visitor = _DioGetVisitor();
       member.body.visitChildren(visitor);
+      final callArguments = _buildCallArguments(member.parameters);
       for (final endpoint in visitor.endpoints) {
         endpoints.add(EndpointInfo(
           className: className,
@@ -91,7 +94,9 @@ class _DataSourceVisitor extends RecursiveAstVisitor<void> {
           endpoint: endpoint,
           group: _extractGroup(endpoint),
           name: _extractName(endpoint),
+          featureName: featureName,
           sourceFilePath: filePath,
+          callArguments: callArguments,
         ));
       }
     }
@@ -110,6 +115,74 @@ class _DataSourceVisitor extends RecursiveAstVisitor<void> {
         path.split('/').where((segment) => segment.isNotEmpty).toList();
     if (parts.length <= 1) return parts.isEmpty ? 'root' : parts.first;
     return parts.skip(1).join('-');
+  }
+
+  String _buildCallArguments(FormalParameterList? parameters) {
+    if (parameters == null) return '';
+
+    final positional = <String>[];
+    final named = <String>[];
+
+    for (final parameter in parameters.parameters) {
+      final value = _defaultArgumentValue(parameter);
+      if (value == null) continue;
+
+      final namedParam = _namedParameter(parameter);
+      if (namedParam != null) {
+        named.add('$namedParam: $value');
+      } else {
+        positional.add(value);
+      }
+    }
+
+    return [...positional, ...named].join(', ');
+  }
+
+  String? _namedParameter(FormalParameter parameter) {
+    final child =
+        parameter is DefaultFormalParameter ? parameter.parameter : parameter;
+    if (!child.isNamed) return null;
+
+    if (child is SimpleFormalParameter) {
+      return child.name?.lexeme;
+    }
+    if (child is FieldFormalParameter) {
+      return child.name.lexeme;
+    }
+    if (child is FunctionTypedFormalParameter) {
+      return child.name.lexeme;
+    }
+    return null;
+  }
+
+  String? _defaultArgumentValue(FormalParameter parameter) {
+    final typeName = _extractTypeName(parameter)?.toLowerCase();
+    switch (typeName) {
+      case 'string':
+        return "''";
+      case 'int':
+        return '1';
+      case 'bool':
+        return 'false';
+      default:
+        return 'null';
+    }
+  }
+
+  String? _extractTypeName(FormalParameter parameter) {
+    final param =
+        parameter is DefaultFormalParameter ? parameter.parameter : parameter;
+
+    final type = param is SimpleFormalParameter
+        ? param.type
+        : param is FieldFormalParameter
+            ? param.type
+            : null;
+
+    if (type is NamedType) {
+      return type.name.lexeme;
+    }
+    return null;
   }
 }
 

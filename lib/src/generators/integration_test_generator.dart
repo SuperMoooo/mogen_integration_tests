@@ -44,10 +44,13 @@ class IntegrationTestGenerator {
     buffer.writeln('      datasource = ${endpoint.className}(dio);');
     buffer.writeln('    });');
     buffer.writeln();
+    final args = endpoint.callArguments.isNotEmpty
+        ? '(${endpoint.callArguments})'
+        : '()';
     buffer.writeln(
         "    test('calls ${endpoint.methodName}() successfully', () async {");
     buffer.writeln('      try {');
-    buffer.writeln('        await datasource.${endpoint.methodName}();');
+    buffer.writeln('        await datasource.${endpoint.methodName}$args;');
     buffer.writeln('      } on DioException catch (e) {');
     buffer.writeln(
         '        // A DioException means the request reached the server.');

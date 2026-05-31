@@ -34,7 +34,9 @@ class EndpointInfo {
     required this.endpoint,
     required this.group,
     required this.name,
+    required this.featureName,
     required this.sourceFilePath,
+    this.callArguments = '',
   });
 
   /// The datasource class name containing this endpoint call.
@@ -55,8 +57,14 @@ class EndpointInfo {
   /// The secondary path segment(s), used for test naming (e.g., 'Auth').
   final String name;
 
+  /// The feature name containing this endpoint (e.g. 'auth', 'cart').
+  final String featureName;
+
   /// Absolute file path to the datasource file containing this endpoint.
   final String sourceFilePath;
+
+  /// The generated call arguments for the datasource method.
+  final String callArguments;
 
   /// Generates the test file name from the endpoint's name and group.
   ///
@@ -66,11 +74,10 @@ class EndpointInfo {
     return '${_toSnakeCase(segment)}_test.dart';
   }
 
-  /// Returns the test directory name based on the endpoint's group.
+  /// Returns the test directory name based on the feature name.
   ///
-  /// Used to organize test files under `test/integration/features/<importGroup>/`
-  /// Example: group 'Authenticate' → importGroup: 'authenticate'
-  String get importGroup => _toSnakeCase(group);
+  /// Used to organize test files under `test/integration/features/<featureName>/`
+  String get importGroup => _toSnakeCase(featureName);
 
   String _toSnakeCase(String value) {
     final words = value
