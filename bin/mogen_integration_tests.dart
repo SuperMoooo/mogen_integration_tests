@@ -4,7 +4,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:mogen_integration_tests/mogen_unit_tests.dart';
+import 'package:mogen_integration_tests/src/generators/test_orchestrator.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
