@@ -68,10 +68,10 @@ class EndpointInfo {
 
   /// Generates the test file name from the endpoint's name and group.
   ///
-  /// Example: endpoint `/Authenticate/Auth` → fileName: 'auth_test.dart'
+  /// Example: endpoint `/Authenticate/Auth` → fileName: 'auth_integration_test.dart'
   String get fileName {
     final segment = name.isEmpty ? group : name;
-    return '${_toSnakeCase(segment)}_test.dart';
+    return '${_toSnakeCase(segment)}_integration_test.dart';
   }
 
   /// Returns the test directory name based on the feature name.
