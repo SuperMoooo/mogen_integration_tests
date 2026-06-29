@@ -128,33 +128,39 @@ class TestOrchestrator {
   }
 
   static const _dioHelperContent = '''import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
+import '../../lib/config/env/app_env.dart';
+import '../../lib/core/constants/api_constants.dart';
+import '../../lib/core/utils/app_logger.dart';
 
 /// Builds a plain Dio client for integration tests.
 ///
 /// Replace the values below with your own API base URL and request
 /// timeouts before running the generated tests.
 Dio buildTestDio() {
-  return Dio(
-    BaseOptions(
-      baseUrl: 'https://example.com',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      headers: <String, dynamic>{
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    ),
-  );
-}
+  final dio =
+      Dio(
+          BaseOptions(
+            baseUrl: "",
+            connectTimeout: ApiConstants.connectTimeout,
+            receiveTimeout: ApiConstants.receiveTimeout,
+            headers: const {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          ),
+        )
+        ..interceptors.add(
+          LogInterceptor(
+            requestBody: true,
+            responseBody: true,
+            logPrint: (msg) => appLogger.d(msg.toString()),
+          ),
+        );
 
-/// Builds an authenticated Dio client for integration tests.
-///
-/// Implement token acquisition or authentication setup for your app.
-Future<Dio> buildAuthenticatedTestDio() async {
-  final dio = buildTestDio();
-  // TODO: Use a real test account or authentication flow here.
   return dio;
 }
+
 ''';
 }
 
