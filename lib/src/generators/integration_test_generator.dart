@@ -30,6 +30,7 @@ class IntegrationTestGenerator {
     buffer.writeln('// ignore_for_file: lines_longer_than_80_chars');
     buffer.writeln();
     buffer.writeln("import 'package:dio/dio.dart';");
+    buffer.writeln("import 'package:flutter_test/flutter_test.dart';");
     buffer.writeln("import '../../dio_helper.dart';");
     buffer.writeln("import '$importPath';");
     buffer.writeln();
